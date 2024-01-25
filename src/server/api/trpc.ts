@@ -1,17 +1,8 @@
-/**
- * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
- * 1. You want to modify request context (see Part 1).
- * 2. You want to create a new middleware or type of procedure (see Part 3).
- *
- * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
- * need to use are documented accordingly near the end.
- */
-
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { getServerAuthSession } from "~/server/auth";
+import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 
 /**
@@ -27,7 +18,7 @@ import { db } from "~/server/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const session = await getServerAuthSession();
+  const session = await auth();
 
   return {
     db,
