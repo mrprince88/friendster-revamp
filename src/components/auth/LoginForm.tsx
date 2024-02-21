@@ -34,8 +34,7 @@ export default function Login() {
     },
   });
 
-  const { mutate, isError, isSuccess, isLoading } =
-    api.auth.login.useMutation();
+  const { mutate, isError, isSuccess, isLoading } = api.auth.login.useMutation();
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     mutate(values);

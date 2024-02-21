@@ -1,49 +1,45 @@
-import { z } from "zod";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import bcrypt from "bcrypt";
-
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
 
 import { LoginSchema, RegisterSchema } from "~/schemas";
 
 export const authRouter = createTRPCRouter({
-  login: protectedProcedure
-    .input(LoginSchema)
+  login: publicProcedure.input(LoginSchema).mutation(async ({ input, ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: {
+        email: input.email,
+      },
+    });
+
+    if (!user) {
+      throw new Error("Invalid email or password");
+    }
+
+    return user;
+  }),
+  register: publicProcedure
+    .input(RegisterSchema)
     .mutation(async ({ input, ctx }) => {
-      const user = await ctx.db.user.findFirst({
+      const userExists = await ctx.db.user.findUnique({
         where: {
           email: input.email,
         },
       });
 
-      if (!user) {
-        throw new Error("No user found! Please register first.");
+      if (userExists) {
+        throw new Error("User already exists");
       }
 
-      const isPasswordValid = await bcrypt.compare(
-        input.password,
-        user.password,
-      );
+      const hashedPassword = await bcrypt.hash(input.password, 10);
 
-      if (!isPasswordValid) {
-        throw new Error("Invalid password!");
-      }
-
-      return "Logged in!";
-    }),
-  register: protectedProcedure
-    .input(RegisterSchema)
-    .mutation(async ({ input, ctx }) => {
-      console.log("hi");
-      return ctx.db.user.create({
+      const user = await ctx.db.user.create({
         data: {
           email: input.email,
+          password: hashedPassword,
           name: input.name,
-          password: input.password,
         },
       });
+
+      return user;
     }),
 });
