@@ -34,7 +34,8 @@ export default function Login() {
     },
   });
 
-  const { mutate, isError, isSuccess, isLoading } = api.auth.login.useMutation();
+  const { mutate, isError, isSuccess, isLoading } =
+    api.auth.login.useMutation();
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     mutate(values);
@@ -74,7 +75,12 @@ export default function Login() {
           />
           {isError && <FormError message="Some error occured" />}
           {isSuccess && <FormSuccess message="Successful!" />}
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            className="w-full"
+            isLoading={isLoading}
+            disabled={isLoading}
+          >
             Login
           </Button>
         </form>

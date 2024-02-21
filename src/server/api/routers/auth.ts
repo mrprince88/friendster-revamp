@@ -1,6 +1,6 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import bcrypt from "bcrypt";
-
+import { signIn } from "~/server/auth";
 import { LoginSchema, RegisterSchema } from "~/schemas";
 
 export const authRouter = createTRPCRouter({
@@ -14,6 +14,17 @@ export const authRouter = createTRPCRouter({
     if (!user) {
       throw new Error("Invalid email or password");
     }
+
+    const passwordMatch = await bcrypt.compare(input.password, user.password);
+
+    if (!passwordMatch) {
+      throw new Error("Invalid email or password");
+    }
+
+    signIn("credentials", {
+      email: input.email,
+      password: input.password,
+    });
 
     return user;
   }),
