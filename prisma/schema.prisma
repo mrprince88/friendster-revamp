@@ -8,17 +8,24 @@ datasource db {
     directUrl = env("DIRECT_URL")
 }
 
-// model Post {
-//     id        Int      @id @default(autoincrement())
-//     name      String
-//     createdAt DateTime @default(now())
-//     updatedAt DateTime @updatedAt
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
 
-//     createdBy   User   @relation(fields: [createdById], references: [id])
-//     createdById String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-//     @@index([name])
-// }
+  @@unique([provider, providerAccountId])
+}
 
 
 model User {
@@ -29,4 +36,5 @@ model User {
     image         String?
     following     User[]    @relation("UserFollows")
     followers     User[]    @relation("UserFollows")
+    accounts      Account[]
 }

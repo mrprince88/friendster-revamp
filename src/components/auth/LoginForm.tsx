@@ -18,7 +18,6 @@ import {
 } from "~/components/ui/form";
 import FormError from "~/components/auth/FormError";
 import FormSuccess from "~/components/auth/FormSuccess";
-import { authRouter } from "~/server/api/routers/auth";
 import { LoginSchema } from "~/schemas";
 
 import { api } from "~/trpc/react";

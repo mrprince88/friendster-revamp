@@ -1,32 +1,34 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import bcrypt from "bcrypt";
-import { signIn } from "~/server/auth";
+import bcrypt from "bcryptjs";
 import { LoginSchema, RegisterSchema } from "~/schemas";
+import { signIn } from "~/server/auth";
+import { AuthError } from "next-auth";
+import { isRedirectError } from "next/dist/client/components/redirect";
 
 export const authRouter = createTRPCRouter({
   login: publicProcedure.input(LoginSchema).mutation(async ({ input, ctx }) => {
-    const user = await ctx.db.user.findUnique({
-      where: {
+    try {
+      await signIn("credentials", {
         email: input.email,
-      },
-    });
+        password: input.password,
+        redirectTo: "/home",
+      });
+    } catch (error) {
+      console.log({ error });
+      if (error instanceof Error) {
+        const { type, cause } = error as AuthError;
+        switch (type) {
+          case "CredentialsSignin":
+            return "Invalid credentials.";
+          case "CallbackRouteError":
+            return cause?.err?.toString();
+          default:
+            return "Something went wrong.";
+        }
+      }
 
-    if (!user) {
-      throw new Error("Invalid email or password");
+      throw error;
     }
-
-    const passwordMatch = await bcrypt.compare(input.password, user.password);
-
-    if (!passwordMatch) {
-      throw new Error("Invalid email or password");
-    }
-
-    signIn("credentials", {
-      email: input.email,
-      password: input.password,
-    });
-
-    return user;
   }),
   register: publicProcedure
     .input(RegisterSchema)
