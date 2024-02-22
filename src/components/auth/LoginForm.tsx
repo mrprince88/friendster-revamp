@@ -1,6 +1,6 @@
 "use client";
 
-import * as z from "zod";
+import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -37,8 +37,10 @@ export default function Login() {
   const { mutate, isError, isSuccess, isLoading } =
     api.auth.login.useMutation();
 
-  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-    signIn(values.email, values.password);
+  const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    await signIn(values.email, values.password).catch((err) =>
+      console.log(err),
+    );
   };
 
   return (

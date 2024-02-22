@@ -2,16 +2,16 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import bcrypt from "bcryptjs";
 import { LoginSchema, RegisterSchema } from "~/schemas";
 import { signIn } from "~/server/auth";
-import { AuthError } from "next-auth";
+import { type AuthError } from "next-auth";
 
 export const authRouter = createTRPCRouter({
   login: publicProcedure.input(LoginSchema).mutation(async ({ input, ctx }) => {
     try {
-      signIn("credentials", {
+      await signIn("credentials", {
         email: input.email,
         password: input.password,
         redirect: false,
-      }).then(() => console.log("signed in"));
+      });
     } catch (error) {
       if (error instanceof Error) {
         const { type, cause } = error as AuthError;

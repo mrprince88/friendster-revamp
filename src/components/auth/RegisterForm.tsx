@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import * as z from "zod";
+import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -45,7 +45,7 @@ export default function Register() {
     });
 
   const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
-    mutateAsync(values);
+    await mutateAsync(values).catch((err) => console.log(err));
   };
 
   return (
