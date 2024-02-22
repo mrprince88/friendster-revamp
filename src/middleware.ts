@@ -9,23 +9,21 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const nextUrl = req.nextUrl;
 
-  console.log("isLoggedIn", isLoggedIn);
-
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
   if (isApiAuthRoute) return;
 
-  // if (isAuthRoute) {
-  //   if (isLoggedIn) return;
-  //   return;
-  // }
+  if (isAuthRoute) {
+    if (isLoggedIn) return;
+    return;
+  }
 
-  // if (!isLoggedIn) {
-  //   return Response.redirect(new URL("/auth/login", nextUrl));
-  // }
+  if (!isLoggedIn) {
+    return Response.redirect(new URL("/auth/login", nextUrl));
+  }
 
-  // return;
+  return;
 });
 
 export const config = {

@@ -3,18 +3,16 @@ import bcrypt from "bcryptjs";
 import { LoginSchema, RegisterSchema } from "~/schemas";
 import { signIn } from "~/server/auth";
 import { AuthError } from "next-auth";
-import { isRedirectError } from "next/dist/client/components/redirect";
 
 export const authRouter = createTRPCRouter({
   login: publicProcedure.input(LoginSchema).mutation(async ({ input, ctx }) => {
     try {
-      await signIn("credentials", {
+      signIn("credentials", {
         email: input.email,
         password: input.password,
-        redirectTo: "/home",
-      });
+        redirect: false,
+      }).then(() => console.log("signed in"));
     } catch (error) {
-      console.log({ error });
       if (error instanceof Error) {
         const { type, cause } = error as AuthError;
         switch (type) {
@@ -26,8 +24,6 @@ export const authRouter = createTRPCRouter({
             return "Something went wrong.";
         }
       }
-
-      throw error;
     }
   }),
   register: publicProcedure

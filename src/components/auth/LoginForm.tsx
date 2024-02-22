@@ -19,6 +19,7 @@ import {
 import FormError from "~/components/auth/FormError";
 import FormSuccess from "~/components/auth/FormSuccess";
 import { LoginSchema } from "~/schemas";
+import { signIn } from "~/actions/login";
 
 import { api } from "~/trpc/react";
 
@@ -37,7 +38,7 @@ export default function Login() {
     api.auth.login.useMutation();
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-    mutate(values);
+    signIn(values.email, values.password);
   };
 
   return (
