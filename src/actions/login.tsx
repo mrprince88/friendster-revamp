@@ -11,8 +11,8 @@ export async function signIn(email: string, password: string) {
       redirectTo: DEFAULT_LOGIN_REDIRECT,
     });
   } catch (error) {
-    if (error instanceof Error) {
-      const { type, cause } = error as AuthError;
+    if (error instanceof AuthError) {
+      const { type, cause } = error;
       switch (type) {
         case "CredentialsSignin":
           return { error: "Invalid credentials." };
@@ -23,7 +23,7 @@ export async function signIn(email: string, password: string) {
       }
     }
 
-    // i dont know why but it does not work without this
+    // fixes NEXT REDIRECT ERROR
     throw error;
   }
 }
