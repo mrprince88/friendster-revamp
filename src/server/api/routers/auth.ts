@@ -1,31 +1,8 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import bcrypt from "bcryptjs";
-import { LoginSchema, RegisterSchema } from "~/schemas";
-import { signIn } from "~/server/auth";
-import { type AuthError } from "next-auth";
+import { RegisterSchema } from "~/schemas";
 
 export const authRouter = createTRPCRouter({
-  login: publicProcedure.input(LoginSchema).mutation(async ({ input, ctx }) => {
-    try {
-      await signIn("credentials", {
-        email: input.email,
-        password: input.password,
-        redirect: false,
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        const { type, cause } = error as AuthError;
-        switch (type) {
-          case "CredentialsSignin":
-            return "Invalid credentials.";
-          case "CallbackRouteError":
-            return cause?.err?.toString();
-          default:
-            return "Something went wrong.";
-        }
-      }
-    }
-  }),
   register: publicProcedure
     .input(RegisterSchema)
     .mutation(async ({ input, ctx }) => {

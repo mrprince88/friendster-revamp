@@ -4,6 +4,7 @@ import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useTransition, useState } from "react";
 
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
@@ -21,10 +22,10 @@ import FormSuccess from "~/components/auth/FormSuccess";
 import { LoginSchema } from "~/schemas";
 import { signIn } from "~/actions/login";
 
-import { api } from "~/trpc/react";
-
 export default function Login() {
   const router = useRouter();
+  const [isLoading, startLogin] = useTransition();
+  const [error, setError] = useState("");
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -34,13 +35,11 @@ export default function Login() {
     },
   });
 
-  const { mutate, isError, isSuccess, isLoading } =
-    api.auth.login.useMutation();
-
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-    await signIn(values.email, values.password).catch((err) =>
-      console.log(err),
-    );
+    startLogin(async () => {
+      const data = await signIn(values.email, values.password);
+      if (data?.error) setError(data.error);
+    });
   };
 
   return (
@@ -75,8 +74,8 @@ export default function Login() {
               </FormItem>
             )}
           />
-          {isError && <FormError message="Some error occured" />}
-          {isSuccess && <FormSuccess message="Successful!" />}
+          {error && <FormError message={error} />}
+          {/* {isSuccess && <FormSuccess message="Successful!" />} */}
           <Button
             type="submit"
             className="w-full"
