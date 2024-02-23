@@ -4,4 +4,4 @@ export const protectedRoutes = ["home"];
 
 export const apiAuthPrefix = "/api";
 
-export const DEFAUT_LOGIN_REDIRECT = "/home";
+export const DEFAULT_LOGIN_REDIRECT = "/";
